@@ -51,6 +51,9 @@ release-notes.html
 *.7z
 RELEASE_CHANGELOG.md
 deps/
+*dsa_priv*.pem
+*eddsa_priv*
+*private_key*
 arm64x_wrapper/*.o
 arm64x_wrapper/*.dll
 arm64x_wrapper/*.ime

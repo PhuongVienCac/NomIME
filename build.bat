@@ -10,7 +10,7 @@ if not defined NOMIME_ROOT set NOMIME_ROOT=%CD%
 
 if not defined VERSION_MAJOR set VERSION_MAJOR=1
 if not defined VERSION_MINOR set VERSION_MINOR=0
-if not defined VERSION_PATCH set VERSION_PATCH=4
+if not defined VERSION_PATCH set VERSION_PATCH=6
 
 if not defined NOMIME_VERSION set NOMIME_VERSION=%VERSION_MAJOR%.%VERSION_MINOR%.%VERSION_PATCH%
 if not defined NOMIME_BUILD set NOMIME_BUILD=0
@@ -30,8 +30,7 @@ if not defined RELEASE_BUILD (
     for /f "delims=" %%i in ('git rev-list %LAST_TAG%..HEAD --count') do (
       set NOMIME_BUILD=%%i
     )
-    rem get short commmit id of head
-    for /F %%i in ('git rev-parse --short HEAD') do (set PRODUCT_VERSION=%NOMIME_VERSION%.%NOMIME_BUILD%.%%i)
+    set PRODUCT_VERSION=%NOMIME_VERSION%.%NOMIME_BUILD%
   )
 )
 
@@ -201,8 +200,6 @@ if not defined SDKVER set build_sdk_option=
 
 if %build_arm64% == 1 (
 
-  msbuild.exe nomime.sln %build_option% /p:Configuration=%build_config% /p:Platform="ARM" /fl6 %build_sdk_option%
-  if errorlevel 1 goto error
   msbuild.exe nomime.sln %build_option% /p:Configuration=%build_config% /p:Platform="ARM64" /fl5 %build_sdk_option%
   if errorlevel 1 goto error
 )
@@ -242,7 +239,6 @@ rem build boost
     --with-locale^
     --with-regex^
     --with-serialization^
-    --with-system^
     --with-thread^
     define=BOOST_USE_WINAPI_VERSION=0x0603^
     toolset=%BJAM_TOOLSET%^
@@ -277,8 +273,6 @@ rem build boost
   if errorlevel 1 goto error
   
   if %build_arm64% == 1 (
-    b2 %BJAM_OPTIONS_ARM32% stage %BOOST_COMPILED_LIBS%
-    if errorlevel 1 goto error
     b2 %BJAM_OPTIONS_ARM64% stage %BOOST_COMPILED_LIBS%
     if errorlevel 1 goto error
   )

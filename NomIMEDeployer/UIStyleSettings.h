@@ -19,6 +19,19 @@ class UIStyleSettings {
   std::string GetActiveColorScheme();
   bool SelectColorScheme(const std::string& color_scheme_id);
 
+  std::wstring GetFontFace();
+  void SetFontFace(const std::wstring& font_face);
+  int GetFontPoint();
+  void SetFontPoint(int font_point);
+  std::wstring GetCommentFontFace();
+  void SetCommentFontFace(const std::wstring& font_face);
+  int GetCommentFontPoint();
+  void SetCommentFontPoint(int font_point);
+  bool GetHorizontal();
+  void SetHorizontal(bool horizontal);
+  bool GetShowComment();
+  void SetShowComment(bool show_comment);
+
   RimeCustomSettings* settings() { return settings_; }
 
  private:

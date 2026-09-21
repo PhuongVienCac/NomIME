@@ -2,6 +2,12 @@
 #include "NomIMEServerApp.h"
 #include <filesystem>
 
+namespace {
+// Public half of the EdDSA (ed25519) keypair used to verify signed update
+// packages. The private key never lives in this repository.
+const char kUpdateEdDSAPubKey[] = "iKlWbt/4/QREKLOJm9cKP1Fx0w1zPKHtbfxHDacITio=";
+}  // namespace
+
 NomIMEServerApp::NomIMEServerApp()
     : m_handler(std::make_unique<RimeWithNomIMEHandler>(&m_ui)),
       tray_icon(m_ui) {
@@ -18,6 +24,7 @@ int NomIMEServerApp::Run() {
 
   // win_sparkle_set_appcast_url("http://localhost:8000/nomime/update/appcast.xml");
   win_sparkle_set_registry_path("Software\\SinoNom\\NomIME\\Updates");
+  win_sparkle_set_eddsa_public_key(kUpdateEdDSAPubKey);
   if (GetThreadUILanguage() ==
       MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL))
     win_sparkle_set_lang("zh-TW");
@@ -62,11 +69,11 @@ void NomIMEServerApp::SetupMenuHandlers() {
       ID_NOMIMETRAY_SYNC,
       std::bind(execute, dir / L"NomIMEDeployer.exe", std::wstring(L"/sync")));
   m_server.AddMenuHandler(ID_NOMIMETRAY_WIKI,
-                          std::bind(open, L"https://bogo.hannom.org/docs"));
+                          std::bind(open, L"https://bogo.hannom.org/docs/"));
   m_server.AddMenuHandler(ID_NOMIMETRAY_HOMEPAGE,
                           std::bind(open, L"https://bogo.hannom.org/"));
   m_server.AddMenuHandler(ID_NOMIMETRAY_FORUM,
-                          std::bind(open, L"https://bogo.hannom.org/docs"));
+                          std::bind(open, L"https://facebook.com/groups/phuongviencac/"));
   m_server.AddMenuHandler(ID_NOMIMETRAY_CHECKUPDATE, check_update);
   m_server.AddMenuHandler(ID_NOMIMETRAY_INSTALLDIR, std::bind(explore, dir));
   m_server.AddMenuHandler(ID_NOMIMETRAY_USERCONFIG,

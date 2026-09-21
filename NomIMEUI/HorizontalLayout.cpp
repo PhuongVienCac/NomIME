@@ -80,6 +80,11 @@ void HorizontalLayout::DoLayout(CDCHandle dc, PDWR pDWR) {
   int height_of_rows[MAX_CANDIDATES_COUNT] = {0};    // height of every row
   int row_of_candidate[MAX_CANDIDATES_COUNT] = {0};  // row info of every cand
   int mintop_of_rows[MAX_CANDIDATES_COUNT] = {0};
+  // right edge, height of the first line (label/text) and of the whole cell
+  // (first line + comment below the text) of every candidate
+  int cand_right[MAX_CANDIDATES_COUNT] = {0};
+  int first_h[MAX_CANDIDATES_COUNT] = {0};
+  int cell_h[MAX_CANDIDATES_COUNT] = {0};
   // only when there are candidates
   if (candidates_count) {
     w = offsetX + real_margin_x;
@@ -102,37 +107,52 @@ void HorizontalLayout::DoLayout(CDCHandle dc, PDWR pDWR) {
       w += _style.hilite_spacing;
       const std::wstring& text = candidates.at(i).str;
       GetTextSizeDW(text, text.length(), pDWR->pTextFormat, pDWR, &size);
-      _candidateTextRects[i].SetRect(w, height, w + size.cx * textFontValid,
-                                     height + size.cy);
-      w += size.cx * textFontValid;
-      current_cand_width += (size.cx + _style.hilite_spacing) * textFontValid;
+      int text_w = size.cx * textFontValid;
+      int text_h = size.cy;
+      int first_line_h = max(_candidateLabelRects[i].Height(), text_h);
+      int comment_w = 0;
+      int comment_h = 0;
 
-      /* Comment */
+      /* Comment: placed below the text */
       bool cmtFontNotTrans =
           (i == id && (_style.hilited_comment_text_color & 0xff000000)) ||
           (i != id && (_style.comment_text_color & 0xff000000));
-      if (!comments.at(i).str.empty() && cmtFontValid && cmtFontNotTrans) {
+      bool has_comment =
+          !comments.at(i).str.empty() && cmtFontValid && cmtFontNotTrans;
+      if (has_comment) {
         const std::wstring& comment = comments.at(i).str;
         GetTextSizeDW(comment, comment.length(), pDWR->pCommentTextFormat, pDWR,
                       &size);
-        w += _style.hilite_spacing;
-        _candidateCommentRects[i].SetRect(w, height, w + size.cx * cmtFontValid,
-                                          height + size.cy);
-        w += size.cx * cmtFontValid;
-        current_cand_width += (size.cx + _style.hilite_spacing) * cmtFontValid;
+        comment_w = size.cx * cmtFontValid;
+        comment_h = size.cy * cmtFontValid;
+      }
+      // the text and its comment are centered on each other inside a column
+      // as wide as the wider of the two
+      int column_w = max(text_w, comment_w);
+      int text_left = w + (column_w - text_w) / 2;
+      _candidateTextRects[i].SetRect(text_left, height, text_left + text_w,
+                                     height + text_h);
+      if (has_comment) {
+        int comment_left = w + (column_w - comment_w) / 2;
+        _candidateCommentRects[i].SetRect(comment_left, height + first_line_h,
+                                          comment_left + comment_w,
+                                          height + first_line_h + comment_h);
       } else /* Used for highlighted candidate calculation below */
-        _candidateCommentRects[i].SetRect(w, height, w, height + size.cy);
+        _candidateCommentRects[i].SetRect(w, height, w, height);
+      w += column_w;
+      current_cand_width += (column_w + _style.hilite_spacing) * textFontValid;
+      cand_right[i] = w;
+      first_h[i] = first_line_h;
+      cell_h[i] = first_line_h + comment_h;
 
       int base_left = (i == id) ? _candidateLabelRects[i].left - base_offset
                                 : _candidateLabelRects[i].left;
       // if not the first candidate of current row, and current candidate's
       // right > _style.max_width
       if (_style.max_width > 0 && (base_left > real_margin_x + offsetX) &&
-          (_candidateCommentRects[i].right - offsetX + real_margin_x >
-           _style.max_width)) {
+          (cand_right[i] - offsetX + real_margin_x > _style.max_width)) {
         // max_width_of_rows current row
-        max_width_of_rows =
-            max(max_width_of_rows, _candidateCommentRects[i - 1].right);
+        max_width_of_rows = max(max_width_of_rows, cand_right[i - 1]);
         w = offsetX + real_margin_x + (i == id ? base_offset : 0);
         int ofx = w - _candidateLabelRects[i].left;
         int ofy = height_of_rows[row_cnt] + _style.candidate_spacing;
@@ -140,10 +160,10 @@ void HorizontalLayout::DoLayout(CDCHandle dc, PDWR pDWR) {
         _candidateLabelRects[i].OffsetRect(ofx, ofy);
         _candidateTextRects[i].OffsetRect(ofx, ofy);
         _candidateCommentRects[i].OffsetRect(ofx, ofy);
+        cand_right[i] += ofx;
         // max width of next row, if it's the last candidate, make sure
         // max_width_of_rows calc right
-        max_width_of_rows =
-            max(max_width_of_rows, _candidateCommentRects[i].right);
+        max_width_of_rows = max(max_width_of_rows, cand_right[i]);
         mintop_of_rows[row_cnt] = height;
         height += ofy;
         // re calc rect position, decrease offsetX for origin
@@ -151,14 +171,9 @@ void HorizontalLayout::DoLayout(CDCHandle dc, PDWR pDWR) {
         row_cnt++;
       } else
         max_width_of_rows = max(max_width_of_rows, w);
-      // calculate height of current row is the max of three rects
+      // height of current row is the tallest cell (text with comment below)
       mintop_of_rows[row_cnt] = height;
-      height_of_rows[row_cnt] =
-          max(height_of_rows[row_cnt], _candidateLabelRects[i].Height());
-      height_of_rows[row_cnt] =
-          max(height_of_rows[row_cnt], _candidateTextRects[i].Height());
-      height_of_rows[row_cnt] =
-          max(height_of_rows[row_cnt], _candidateCommentRects[i].Height());
+      height_of_rows[row_cnt] = max(height_of_rows[row_cnt], cell_h[i]);
       // set row info of current candidate
       row_of_candidate[i] = row_cnt;
     }
@@ -169,31 +184,27 @@ void HorizontalLayout::DoLayout(CDCHandle dc, PDWR pDWR) {
       int base_left = (i == id) ? _candidateLabelRects[i].left - base_offset
                                 : _candidateLabelRects[i].left;
       _candidateRects[i].SetRect(base_left, mintop_of_rows[row_of_candidate[i]],
-                                 _candidateCommentRects[i].right,
+                                 cand_right[i],
                                  mintop_of_rows[row_of_candidate[i]] +
                                      height_of_rows[row_of_candidate[i]]);
-      int ol = 0, ot = 0, oc = 0;
-      if (_style.align_type == UIStyle::ALIGN_CENTER) {
-        ol = (height_of_rows[row_of_candidate[i]] -
-              _candidateLabelRects[i].Height()) /
-             2;
-        ot = (height_of_rows[row_of_candidate[i]] -
-              _candidateTextRects[i].Height()) /
-             2;
-        oc = (height_of_rows[row_of_candidate[i]] -
-              _candidateCommentRects[i].Height()) /
-             2;
-      } else if (_style.align_type == UIStyle::ALIGN_BOTTOM) {
-        ol = (height_of_rows[row_of_candidate[i]] -
-              _candidateLabelRects[i].Height());
-        ot = (height_of_rows[row_of_candidate[i]] -
-              _candidateTextRects[i].Height());
-        oc = (height_of_rows[row_of_candidate[i]] -
-              _candidateCommentRects[i].Height());
-      }
+      // align the label and the text inside the first line of the cell, then
+      // align the whole cell (first line + comment below) inside the row
+      const auto align_offset = [&](int space) {
+        if (_style.align_type == UIStyle::ALIGN_CENTER)
+          return space / 2;
+        if (_style.align_type == UIStyle::ALIGN_BOTTOM)
+          return space;
+        return 0;
+      };
+      int cell_offset =
+          align_offset(height_of_rows[row_of_candidate[i]] - cell_h[i]);
+      int ol =
+          cell_offset + align_offset(first_h[i] - _candidateLabelRects[i].Height());
+      int ot =
+          cell_offset + align_offset(first_h[i] - _candidateTextRects[i].Height());
       _candidateLabelRects[i].OffsetRect(0, ol);
       _candidateTextRects[i].OffsetRect(0, ot);
-      _candidateCommentRects[i].OffsetRect(0, oc);
+      _candidateCommentRects[i].OffsetRect(0, cell_offset);
     }
     height = mintop_of_rows[row_cnt] + height_of_rows[row_cnt] - offsetY;
     width = max(width, max_width_of_rows);

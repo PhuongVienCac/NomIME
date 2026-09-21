@@ -63,9 +63,8 @@ static int Run(LPTSTR lpCmdLine) {
   configurator.Initialize();
 
   if (!wcscmp(L"/?", lpCmdLine) || !wcscmp(L"/help", lpCmdLine)) {
-    WCHAR msg[1024] = {0};
-    if (LoadString(GetModuleHandle(NULL), IDS_STR_HELP, msg,
-                   sizeof(msg) / sizeof(TCHAR))) {
+    CString msg = LoadStr(IDS_STR_HELP);
+    if (!msg.IsEmpty()) {
       MessageBox(NULL, msg, L"NomIME Deployer", MB_ICONINFORMATION | MB_OK);
     } else {
       MessageBox(NULL,

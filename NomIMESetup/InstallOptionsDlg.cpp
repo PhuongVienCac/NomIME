@@ -83,6 +83,13 @@ LRESULT InstallOptionsDialog::OnUseDefaultDir(WORD, WORD code, HWND, BOOL&) {
   return 0;
 }
 
+LRESULT InstallOptionsDialog::OnBnClickedRadioCn(WORD /*wNotifyCode*/,
+                                                  WORD /*wID*/,
+                                                  HWND /*hWndCtl*/,
+                                                  BOOL& /*bHandled*/) {
+  return 0;
+}
+
 LRESULT InstallOptionsDialog::OnUseCustomDir(WORD, WORD code, HWND, BOOL&) {
   CShellFileOpenDialog fileOpenDlg(
       NULL, FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_PICKFOLDERS);

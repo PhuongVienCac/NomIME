@@ -229,6 +229,7 @@ struct UIStyle {
   bool paging_on_scroll;
   bool enhanced_position;
   bool click_to_capture;
+  bool show_comment;
   HoverType hover_type;
   AntiAliasMode antialias_mode;
   PreeditType preedit_type;
@@ -306,6 +307,7 @@ struct UIStyle {
         paging_on_scroll(false),
         enhanced_position(false),
         click_to_capture(false),
+        show_comment(true),
         hover_type(NONE),
         antialias_mode(DEFAULT),
         preedit_type(COMPOSITION),
@@ -384,6 +386,7 @@ struct UIStyle {
         current_full_icon != st.current_full_icon ||
         enhanced_position != st.enhanced_position ||
         click_to_capture != st.click_to_capture ||
+        show_comment != st.show_comment ||
         label_text_format != st.label_text_format ||
         min_width != st.min_width || max_width != st.max_width ||
         min_height != st.min_height || max_height != st.max_height ||
@@ -449,6 +452,7 @@ void serialize(Archive& ar, nomime::UIStyle& s, const unsigned int version) {
   ar & s.current_full_icon;
   ar & s.enhanced_position;
   ar & s.click_to_capture;
+  ar & s.show_comment;
   ar & s.label_text_format;
   // layout
   ar & s.layout_type;

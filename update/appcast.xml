@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
 <channel>
-    <title>【NomIME】Phương Viên - Bộ gõ Hán Nôm</title>
+    <title>(NomIME) Phương Viên - Bộ gõ Hán Nôm</title>
     <link>http://bogo.hannom.org/release/nomime/appcast.xml</link>
-    <description>Kênh cập nhật Appcast của Phương Viên - NomIME</description>
+    <description>Kênh cập nhật của Phương Viên - NomIME</description>
     <language>vi</language>
     <item>
-      <title>NomIME 1.0.4</title>
+      <title>NomIME 1.0.5</title>
       <sparkle:releaseNotesLink>http://bogo.hannom.org/release/nomime/</sparkle:releaseNotesLink>
-      <pubDate>Wed, 04 Jun 2026 12:33:57 +0800</pubDate>
-      <enclosure url="https://github.com/VienChi/nomime/releases/download/1.0.4/nomime-1.0.4.0-installer.exe"
-                 sparkle:version="1.0.4"
+      <pubDate>Tue, 14 Jul 2026 09:35:04 +0700</pubDate>
+      <!-- length and sparkle:edSignature must match the exact installer bytes
+           at this url. Regenerate both with update/sign-update.sh whenever a
+           new installer is published; do not hand-edit them. -->
+      <enclosure url="https://github.com/VienChi/nomime/releases/download/1.0.5/nomime-1.0.5.0-installer.exe"
+                 sparkle:version="1.0.5"
+                 length="11273864"
+                 sparkle:edSignature="Hq8RDzuZaZm0UYPXhsEjgtrMVjd8CQ5NIfYQptCb+YtjC1Ts/cm99YZC1ezg1V/EDDZAsL8FwmWDxz5ZES8rAA=="
                  type="application/octet-stream"/>
     </item>
   </channel>

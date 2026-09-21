@@ -27,10 +27,11 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
   SetThreadLocale(langId);
 
   if (!IsWindowsBlueOrLaterEx()) {
-    CString info, cap;
-    info.LoadStringW(IDS_STR_SYSTEM_VERSION_WARNING);
-    cap.LoadStringW(IDS_STR_SYSTEM_VERSION_WARNING_CAPTION);
-    MessageBoxExW(NULL, info, cap, MB_ICONERROR, langId);
+    std::wstring info =
+        LoadStringLang(hInstance, IDS_STR_SYSTEM_VERSION_WARNING, langId);
+    std::wstring cap =
+        LoadStringLang(hInstance, IDS_STR_SYSTEM_VERSION_WARNING_CAPTION, langId);
+    MessageBoxExW(NULL, info.c_str(), cap.c_str(), MB_ICONERROR, langId);
     return 0;
   }
   SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);

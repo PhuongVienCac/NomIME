@@ -194,9 +194,9 @@ inline std::wstring get_nomime_ime_name() {
       langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_HONGKONG) ||
       langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SINGAPORE) ||
       langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_MACAU)) {
-    return L"NomIME";
+    return L"Phương Viên (NomIME)";
   } else {
-    return L"NomIME";
+    return L"Phương Viên (NomIME)";
   }
 }
 
@@ -215,6 +215,14 @@ inline LONG RegGetStringValue(HKEY key,
   return lRes;
 }
 
+// user-selected UI language, written by the settings dialog: vie, eng, chs,
+// cht, or "system" to follow the system language. Missing means Vietnamese.
+inline void SetUserLanguagePreference(const std::wstring& lang) {
+  RegSetKeyValueW(HKEY_CURRENT_USER, L"Software\\SinoNom\\NomIME", L"Language",
+                  REG_SZ, lang.c_str(),
+                  (DWORD)((lang.size() + 1) * sizeof(wchar_t)));
+}
+
 inline LANGID get_language_id() {
   std::wstring lang{};
   if (RegGetStringValue(HKEY_CURRENT_USER, L"Software\\SinoNom\\NomIME",
@@ -225,6 +233,10 @@ inline LANGID get_language_id() {
       return MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
     else if (lang == L"eng")
       return MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+    else if (lang != L"system")
+      return MAKELANGID(LANG_VIETNAMESE, SUBLANG_DEFAULT);
+  } else {
+    return MAKELANGID(LANG_VIETNAMESE, SUBLANG_DEFAULT);
   }
   LANGID langId = GetUserDefaultUILanguage();
   if (langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED) ||
@@ -234,10 +246,47 @@ inline LANGID get_language_id() {
              langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_HONGKONG) ||
              langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_MACAU)) {
     langId = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
-  } else {
+  } else if (PRIMARYLANGID(langId) == LANG_ENGLISH) {
     langId = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+  } else {
+    // NomIME is primarily a Vietnamese Han-Nom IME: default to Vietnamese
+    // for any system language that isn't explicitly Chinese or English.
+    langId = MAKELANGID(LANG_VIETNAMESE, SUBLANG_DEFAULT);
   }
   return langId;
+}
+
+// LoadString/LoadMenu/dialog lookup only honour the UI languages installed in
+// Windows, so SetThreadUILanguage() cannot show e.g. Vietnamese on an English
+// Windows. These helpers pick the resource of an explicit LANGID instead, and
+// fall back to English when a language has no such resource.
+inline std::wstring LoadStringLang(HINSTANCE inst, UINT id, LANGID langId) {
+  const auto load = [&](LANGID lang) -> std::wstring {
+    HRSRC res = FindResourceExW(inst, RT_STRING,
+                                MAKEINTRESOURCEW(id / 16 + 1), lang);
+    HGLOBAL mem = res ? LoadResource(inst, res) : NULL;
+    const WCHAR* p = mem ? static_cast<const WCHAR*>(LockResource(mem)) : NULL;
+    if (!p)
+      return std::wstring();
+    for (UINT i = 0; i < id % 16; ++i)
+      p += 1 + *p;
+    return std::wstring(p + 1, *p);
+  };
+  std::wstring text = load(langId);
+  if (text.empty())
+    text = load(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US));
+  return text;
+}
+
+inline HMENU LoadMenuLang(HINSTANCE inst, UINT id, LANGID langId) {
+  HRSRC res = FindResourceExW(inst, RT_MENU, MAKEINTRESOURCEW(id), langId);
+  if (!res)
+    res = FindResourceExW(inst, RT_MENU, MAKEINTRESOURCEW(id),
+                          MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US));
+  HGLOBAL mem = res ? LoadResource(inst, res) : NULL;
+  if (!mem)
+    return LoadMenuW(inst, MAKEINTRESOURCEW(id));
+  return LoadMenuIndirectW(LockResource(mem));
 }
 
 #define wtou8(x) wstring_to_string(x, CP_UTF8)

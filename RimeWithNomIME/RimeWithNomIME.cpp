@@ -4,6 +4,7 @@
 #include <StringAlgorithm.hpp>
 #include <NomIMEConstants.h>
 #include <NomIMEUtility.h>
+#include <resource.h>
 
 #include <filesystem>
 #include <map>
@@ -97,7 +98,7 @@ void RimeWithNomIMEHandler::_Setup() {
   nomime_traits.distribution_name = distribution_name.c_str();
   nomime_traits.distribution_code_name = NOMIME_CODE_NAME;
   nomime_traits.distribution_version = NOMIME_VERSION;
-  nomime_traits.app_name = "rime.nomime";
+  nomime_traits.app_name = "phuongvien.nomime";
   std::string log_dir = NomIMELogPath().u8string();
   nomime_traits.log_dir = log_dir.c_str();
   rime_api->setup(&nomime_traits);
@@ -675,15 +676,15 @@ bool RimeWithNomIMEHandler::_ShowMessage(Context& ctx, Status& status) {
   std::wstring& tips(ctx.aux.str);
   bool show_icon = false;
   if (m_message_type == "deploy") {
+    const auto text = [](UINT id) {
+      return LoadStringLang(GetModuleHandle(NULL), id, get_language_id());
+    };
     if (m_message_value == "start")
-      tips = L"Đang triển khai RIME";
+      tips = text(IDS_STR_DEPLOY_START);
     else if (m_message_value == "success")
-      tips = L"Đã triển khai xong";
-    else if (m_message_value == "failure") {
-      tips =
-          L"Đã xảy ra lỗi, vui lòng xem nhật ký "
-          L"%TEMP%\\rime.nomime\\rime.nomime.*.INFO";
-    }
+      tips = text(IDS_STR_DEPLOY_SUCCESS);
+    else if (m_message_value == "failure")
+      tips = text(IDS_STR_DEPLOY_FAILURE);
   } else if (m_message_type == "schema") {
     tips = /*L"【" + */ status.schema_name /* + L"】"*/;
   } else if (m_message_type == "option") {
@@ -828,7 +829,8 @@ bool RimeWithNomIMEHandler::_Respond(NomIMESessionId ipc_id, EatLine eat) {
               .append(escape_string(u8tow(preedit)))
               .append(L"  [");
           auto label_valid = session_status.style.label_font_point > 0;
-          auto comment_valid = session_status.style.comment_font_point > 0;
+          auto comment_valid = session_status.style.comment_font_point > 0 &&
+                               session_status.style.show_comment;
           const std::wstring mark_text_w =
               session_status.style.mark_text.empty()
                   ? std::wstring(L"*")
@@ -1216,6 +1218,8 @@ static void _UpdateUIStyle(RimeConfig* config, UI* ui, bool initialize) {
                style.paging_on_scroll);
   _RimeGetBool(config, "style/click_to_capture", initialize,
                style.click_to_capture, true, false);
+  _RimeGetBool(config, "style/show_comment", false, style.show_comment, true,
+               false);
   _RimeGetBool(config, "style/fullscreen", false, style.layout_type,
                ((style.layout_type == UIStyle::LAYOUT_HORIZONTAL)
                     ? UIStyle::LAYOUT_HORIZONTAL_FULLSCREEN

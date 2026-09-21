@@ -1,0 +1,173 @@
+diff --git a/src/rime/algo/syllabifier.cc b/src/rime/algo/syllabifier.cc
+index b7ed6b79..566eead2 100644
+--- a/src/rime/algo/syllabifier.cc
++++ b/src/rime/algo/syllabifier.cc
+@@ -26,6 +26,8 @@ using VertexQueue =
+ // 3. 補全 (Completion)：用戶還沒打完，算法瞎猜的。Penalty ≈ -3.0
+ const double kCompletionPenalty = -2.995732273553991;      // log(0.05)
+ const double kCorrectionCredibility = -4.605170185988091;  // log(0.01)
++// Ranks any non-exact spelling behind every exact one, whatever the weights.
++const double kNonExactPenalty = -100.0;
+ 
+ int Syllabifier::BuildSyllableGraph(const string& input,
+                                     Prism& prism,
+@@ -107,6 +109,9 @@ int Syllabifier::BuildSyllableGraph(const string& input,
+         while (!accessor.exhausted()) {
+           SyllableId syllable_id = accessor.syllable_id();
+           EdgeProperties props(accessor.properties());
++          if (exact_match_first_ && props.type != kNormalSpelling) {
++            props.credibility += kNonExactPenalty;
++          }
+           if (strict_spelling_ && matches_input &&
+               props.type != kNormalSpelling) {
+             // disqualify fuzzy spelling or abbreviation as single word
+@@ -124,6 +129,11 @@ int Syllabifier::BuildSyllableGraph(const string& input,
+               spellings.insert({syllable_id, props});
+             } else {
+               it->second.type = (std::min)(it->second.type, props.type);
++              if (exact_match_first_) {
++                // the same syllable may also be spelled exactly
++                it->second.credibility =
++                    (std::max)(it->second.credibility, props.credibility);
++              }
+             }
+             // let end_vertex_type be the best (smaller) type of spelling
+             // that ends at the vertex
+@@ -225,6 +235,8 @@ int Syllabifier::BuildSyllableGraph(const string& input,
+           if (props.type < kAbbreviation) {
+             props.type = kCompletion;
+             props.credibility += kCompletionPenalty;
++            if (exact_match_first_)
++              props.credibility += kNonExactPenalty;
+             props.end_pos = end_pos;
+             // add a syllable with properties to the edge's
+             // spelling-to-syllable map
+diff --git a/src/rime/algo/syllabifier.h b/src/rime/algo/syllabifier.h
+index 1167e296..da7ae643 100644
+--- a/src/rime/algo/syllabifier.h
++++ b/src/rime/algo/syllabifier.h
+@@ -49,10 +49,12 @@ class Syllabifier {
+   Syllabifier() = default;
+   explicit Syllabifier(const string& delimiters,
+                        bool enable_completion = false,
+-                       bool strict_spelling = false)
++                       bool strict_spelling = false,
++                       bool exact_match_first = false)
+       : delimiters_(delimiters),
+         enable_completion_(enable_completion),
+-        strict_spelling_(strict_spelling) {}
++        strict_spelling_(strict_spelling),
++        exact_match_first_(exact_match_first) {}
+ 
+   RIME_DLL int BuildSyllableGraph(const string& input,
+                                   Prism& prism,
+@@ -66,6 +68,7 @@ class Syllabifier {
+   string delimiters_;
+   bool enable_completion_ = false;
+   bool strict_spelling_ = false;
++  bool exact_match_first_ = false;
+   Corrector* corrector_ = nullptr;
+ };
+ 
+diff --git a/src/rime/gear/script_translator.cc b/src/rime/gear/script_translator.cc
+index aef62178..44003b0e 100644
+--- a/src/rime/gear/script_translator.cc
++++ b/src/rime/gear/script_translator.cc
+@@ -86,7 +86,8 @@ class ScriptSyllabifier : public PhraseSyllabifier {
+         start_(start),
+         syllabifier_(translator->delimiters(),
+                      translator->enable_completion(),
+-                     translator->strict_spelling()) {
++                     translator->strict_spelling(),
++                     translator->exact_match_first()) {
+     if (corrector) {
+       syllabifier_.EnableCorrection(corrector);
+     }
+@@ -448,6 +449,19 @@ static bool has_exact_match_phrase(Ptr ptr, Iter iter, size_t consumed) {
+          iter->second.Peek()->IsExactMatch();
+ }
+ 
++// With `exact_match_only` (and completion off), once the whole input is
++// matched by some phrase, drop the phrases that only match a leading part of
++// it.
++template <class Ptr>
++static void drop_partial_matches(Ptr& collector, size_t consumed) {
++  if (!collector)
++    return;
++  auto full = collector->find(consumed);
++  if (full == collector->end() || full->second.exhausted())
++    return;
++  collector->erase(collector->begin(), full);
++}
++
+ // ScriptTranslation implementation
+ 
+ bool ScriptTranslation::Evaluate(Dictionary* dict, UserDictionary* user_dict) {
+@@ -465,6 +479,10 @@ bool ScriptTranslation::Evaluate(Dictionary* dict, UserDictionary* user_dict) {
+         user_dict->Lookup(syllable_graph, 0, kUnlimitedDepth,
+                           predict_word ? kNumSyllablesToPredictWord : 0);
+   }
++  if (translator_->exact_match_only() && !translator_->enable_completion()) {
++    drop_partial_matches(phrase_, consumed);
++    drop_partial_matches(user_phrase_, consumed);
++  }
+   if (!phrase_ && !user_phrase_)
+     return false;
+ 
+@@ -616,6 +634,17 @@ iter_incremented:
+           [this, full_code_length, phrase_code_length]() {
+             UserDictEntryIterator& uter = user_phrase_iter_->second;
+             DictEntryIterator& iter = phrase_iter_->second;
++            if (translator_->exact_match_first() && !iter.exhausted()) {
++              // a non-exact match, though used more often, never outranks
++              // an exact one (see kNonExactPenalty in syllabifier.cc)
++              const double kTierGap = 50.0;
++              double user_weight = uter.Peek()->weight;
++              double sys_weight = iter.Peek()->weight;
++              if (user_weight - sys_weight > kTierGap)
++                return true;
++              if (sys_weight - user_weight > kTierGap)
++                return false;
++            }
+             // 但若用戶詞爲糾錯結果, 則免去優先權, 回歸權重比較
+             bool user_is_correction = syllabifier_->IsCorrection(
+                 uter.Peek()->code, phrase_code_length);
+diff --git a/src/rime/gear/translator_commons.cc b/src/rime/gear/translator_commons.cc
+index 7fc0f272..00bd6db6 100644
+--- a/src/rime/gear/translator_commons.cc
++++ b/src/rime/gear/translator_commons.cc
+@@ -123,6 +123,10 @@ TranslatorOptions::TranslatorOptions(const Ticket& ticket) {
+     config->GetBool(ticket.name_space + "/enable_completion",
+                     &enable_completion_);
+     config->GetBool(ticket.name_space + "/strict_spelling", &strict_spelling_);
++    config->GetBool(ticket.name_space + "/exact_match_only",
++                    &exact_match_only_);
++    config->GetBool(ticket.name_space + "/exact_match_first",
++                    &exact_match_first_);
+     config->GetDouble(ticket.name_space + "/initial_quality",
+                       &initial_quality_);
+     config->GetInt(ticket.name_space + "/max_sentences", &max_sentences_);
+diff --git a/src/rime/gear/translator_commons.h b/src/rime/gear/translator_commons.h
+index 6217e5a7..b0110fa3 100644
+--- a/src/rime/gear/translator_commons.h
++++ b/src/rime/gear/translator_commons.h
+@@ -163,6 +163,10 @@ class TranslatorOptions {
+   void set_enable_completion(bool enabled) { enable_completion_ = enabled; }
+   bool strict_spelling() const { return strict_spelling_; }
+   void set_strict_spelling(bool is_strict) { strict_spelling_ = is_strict; }
++  bool exact_match_only() const { return exact_match_only_; }
++  void set_exact_match_only(bool enabled) { exact_match_only_ = enabled; }
++  bool exact_match_first() const { return exact_match_first_; }
++  void set_exact_match_first(bool enabled) { exact_match_first_ = enabled; }
+   double initial_quality() const { return initial_quality_; }
+   void set_initial_quality(double quality) { initial_quality_ = quality; }
+   Projection& preedit_formatter() { return preedit_formatter_; }
+@@ -175,6 +179,8 @@ class TranslatorOptions {
+   bool contextual_suggestions_ = false;
+   bool enable_completion_ = true;
+   bool strict_spelling_ = false;
++  bool exact_match_only_ = false;
++  bool exact_match_first_ = false;
+   double initial_quality_ = 0.;
+   int max_sentences_ = 1;
+   double sentence_cutoff_threshold_ = 0.1;

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "resource.h"
+#include "NomIMEDeployer.h"
 
 #include <rime_levers_api.h>
 
-class DictManagementDialog : public CDialogImpl<DictManagementDialog> {
+class DictManagementDialog : public LangDialogImpl<DictManagementDialog> {
  public:
   enum { IDD = IDD_DICT_MANAGEMENT };
 
@@ -20,6 +21,7 @@ class DictManagementDialog : public CDialogImpl<DictManagementDialog> {
   COMMAND_ID_HANDLER(IDC_EXPORT, OnExport)
   COMMAND_ID_HANDLER(IDC_IMPORT, OnImport)
   COMMAND_HANDLER(IDC_USER_DICT_LIST, LBN_SELCHANGE, OnUserDictListSelChange)
+  COMMAND_HANDLER(IDC_STATIC1, STN_CLICKED, OnStnClickedStatic1)
   END_MSG_MAP()
 
   LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&);
@@ -39,4 +41,10 @@ class DictManagementDialog : public CDialogImpl<DictManagementDialog> {
   CButton import_;
 
   RimeLeversApi* api_;
+
+ public:
+  LRESULT OnStnClickedStatic1(WORD /*wNotifyCode*/,
+                              WORD /*wID*/,
+                              HWND /*hWndCtl*/,
+                              BOOL& /*bHandled*/);
 };

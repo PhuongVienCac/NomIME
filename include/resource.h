@@ -12,6 +12,9 @@
 #define IDR_MENU_POPUP_HANT             108
 #define IDR_MENU_POPUP_HANS             109
 #define IDS_STR_UNDER_MAINTENANCE       302
+#define IDS_STR_DEPLOY_START            303
+#define IDS_STR_DEPLOY_SUCCESS          304
+#define IDS_STR_DEPLOY_FAILURE          305
 #define ID_NOMIMETRAY_QUIT              40001
 #define ID_NOMIMETRAY_DEPLOY            40002
 #define ID_NOMIMETRAY_CHECKUPDATE       40003

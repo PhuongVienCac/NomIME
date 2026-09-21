@@ -16,7 +16,7 @@ Layout::Layout(const UIStyle& style,
       candidates_count((int)candidates.size()),
       labelFontValid(!!(_style.label_font_point > 0)),
       textFontValid(!!(_style.font_point > 0)),
-      cmtFontValid(!!(_style.comment_font_point > 0)) {
+      cmtFontValid(!!(_style.comment_font_point > 0 && _style.show_comment)) {
   if (pDWR) {
     float scale = pDWR->dpiScaleLayout;
     _style.min_width = (int)(_style.min_width * scale);

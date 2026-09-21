@@ -133,7 +133,17 @@ HRESULT DirectWriteResources::InitResources(const wstring& label_font_face,
     decltype(fontFaceStrVector)().swap(fontFaceStrVector);
   };
   init_font(font_face, font_point, pTextFormat, wrapping);
-  init_font(font_face, font_point, pPreeditTextFormat, wrapping_preedit);
+  // The text being typed is Latin: show it in the Latin font, and leave the
+  // Han font as the fallback for every other script.
+  wstring preedit_font_face = font_face;
+  vector<wstring> latin_fonts = ws_split(comment_font_face, L",");
+  wstring latin_font = latin_fonts.empty() ? wstring() : latin_fonts[0];
+  if (!latin_font.empty() && latin_font.find(L':') == wstring::npos) {
+    preedit_font_face = latin_font + L":0:24f," + latin_font + L":1e00:1eff," +
+                        font_face;
+  }
+  init_font(preedit_font_face, font_point, pPreeditTextFormat,
+            wrapping_preedit);
   init_font(label_font_face, label_font_point, pLabelTextFormat, wrapping);
   init_font(comment_font_face, comment_font_point, pCommentTextFormat,
             wrapping);

@@ -320,10 +320,10 @@ void NomIMETSF::_HandleLangBarMenuSelect(UINT wID) {
       open(NomIMELogPath().wstring());
       break;
     case ID_NOMIMETRAY_WIKI:
-      open(L"https://bogo.hannom.org/docs");
+      open(L"https://bogo.hannom.org/docs/");
       break;
     case ID_NOMIMETRAY_FORUM:
-      open(L"https://bogo.hannom.org/docs");
+      open(L"https://facebook.com/groups/phuongviencac");
       break;
     default:
       m_client.TrayCommand(wID);

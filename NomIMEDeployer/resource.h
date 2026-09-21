@@ -7,8 +7,7 @@
 #define IDI_NOMIMEDEPLOYER              107
 #define IDI_SMALL                       108
 #define IDR_MAINFRAME                   128
-#define IDD_SWITCHER_SETTING            129
-#define IDD_STYLE_SETTING               130
+#define IDD_SETTINGS                    129
 #define IDI_DEPLOY                      131
 #define IDD_DICT_MANAGEMENT             132
 #define IDS_STR_NOMIME                  133
@@ -43,13 +42,22 @@
 #define IDC_GET_SCHEMATA                1002
 #define IDC_HOTKEYS                     1003
 #define IDC_COLOR_SCHEME                1004
-#define IDC_SELECT_FONT                 1005
 #define IDC_PREVIEW                     1006
 #define IDC_USER_DICT_LIST              1007
 #define IDC_BACKUP                      1008
 #define IDC_RESTORE                     1009
 #define IDC_EXPORT                      1010
 #define IDC_IMPORT                      1011
+#define IDC_FONT_FACE                   1012
+#define IDC_FONT_POINT                  1013
+#define IDC_COMMENT_FONT_FACE           1014
+#define IDC_COMMENT_FONT_POINT          1015
+#define IDC_LAYOUT_HORIZONTAL           1016
+#define IDC_LAYOUT_VERTICAL             1017
+#define IDC_SHOW_COMMENT                1018
+#define IDC_LANGUAGE                    1019
+#define IDC_SUGGEST_EXACT               1020
+#define IDC_SUGGEST_RELATED             1021
 #define IDC_STATIC1                     -1
 
 // Next default values for new objects
@@ -59,7 +67,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

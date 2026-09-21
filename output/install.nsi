@@ -11,29 +11,29 @@ Unicode true
 ; General
 
 !ifndef NOMIME_VERSION
-!define NOMIME_VERSION 1.0.4
+!define NOMIME_VERSION 1.0.6
 !endif
 
 !ifndef NOMIME_BUILD
 !define NOMIME_BUILD 0
 !endif
 
-!define NOMIME_ROOT $INSTDIR\nomime-${NOMIME_VERSION}
+!define NOMIME_ROOT $INSTDIR\NomIME-${NOMIME_VERSION}
 !define REG_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\NomIME"
 
 ; The name of the installer
 Name "NomIME ${NOMIME_VERSION}"
 
 ; The file to write
-OutFile "archives\nomime-${PRODUCT_VERSION}-installer.exe"
+OutFile "archives\NomIME-${PRODUCT_VERSION}-installer.exe"
 
 VIProductVersion "${NOMIME_VERSION}.${NOMIME_BUILD}"
-VIAddVersionKey /LANG=2052 "ProductName" "NomIME"
-VIAddVersionKey /LANG=2052 "Comments" "Powered by RIME | 中州韻輸入法引擎"
-VIAddVersionKey /LANG=2052 "CompanyName" "Phương Viên"
-VIAddVersionKey /LANG=2052 "LegalCopyright" "Copyleft Phương Viên"
-VIAddVersionKey /LANG=2052 "FileDescription" "NomIME輸入法"
-VIAddVersionKey /LANG=2052 "FileVersion" "${NOMIME_VERSION}"
+VIAddVersionKey /LANG=1066 "ProductName" "NomIME"
+VIAddVersionKey /LANG=1066 "Comments" "Powered by Viễn Chi | Bộ gõ Hán Nôm - Phương Viên"
+VIAddVersionKey /LANG=1066 "CompanyName" "Phương Viên"
+VIAddVersionKey /LANG=1066 "LegalCopyright" "Copyleft Phương Viên"
+VIAddVersionKey /LANG=1066 "FileDescription" "Bộ gõ Hán Nôm - Phương Viên"
+VIAddVersionKey /LANG=1066 "FileVersion" "${NOMIME_VERSION}"
 
 !define MUI_ICON ..\resource\nomime.ico
 SetCompressor /SOLID lzma
@@ -45,6 +45,8 @@ RequestExecutionLevel admin
 ;--------------------------------
 
 ; Pages
+
+!insertmacro MUI_RESERVEFILE_LANGDLL
 
 !insertmacro MUI_PAGE_LICENSE "LICENSE.txt"
 !insertmacro MUI_PAGE_DIRECTORY
@@ -59,18 +61,35 @@ RequestExecutionLevel admin
 
 ; Languages
 
+!insertmacro MUI_LANGUAGE "Vietnamese"
+LangString DISPLAYNAME ${LANG_VIETNAMESE} "Phương Viên - NomIME"
+LangString LNKFORMANUAL ${LANG_VIETNAMESE} "Hướng dẫn sử dụng NomIME"
+LangString LNKFORSETTING ${LANG_VIETNAMESE} "Cài đặt Phương Viên - NomIME"
+LangString LNKFORDICT ${LANG_VIETNAMESE} "Quản lý từ điển Phương Viên - NomIME"
+LangString LNKFORSYNC ${LANG_VIETNAMESE} "Đồng bộ hồ sơ người dùng Phương Viên - NomIME"
+LangString LNKFORDEPLOY ${LANG_VIETNAMESE} "Triển khai lại Phương Viên - NomIME"
+LangString LNKFORSERVER ${LANG_VIETNAMESE} "Máy chủ Phương Viên - NomIME"
+LangString LNKFORUSERFOLDER ${LANG_VIETNAMESE} "Thư mục người dùng Phương Viên - NomIME"
+LangString LNKFORAPPFOLDER ${LANG_VIETNAMESE} "Thư mục ứng dụng Phương Viên - NomIME"
+LangString LNKFORUPDATER ${LANG_VIETNAMESE} "Kiểm tra cập nhật Phương Viên - NomIME"
+LangString LNKFORSETUP ${LANG_VIETNAMESE} "Tùy chọn cài đặt Phương Viên - NomIME"
+LangString LNKFORUNINSTALL ${LANG_VIETNAMESE} "Gỡ cài đặt Phương Viên - NomIME"
+LangString CONFIRMATION ${LANG_VIETNAMESE} "Trước khi cài đặt, vui lòng gỡ bỏ phiên bản Phương Viên - NomIME cũ.$\n$\nNhấn 'OK' để gỡ bỏ phiên bản cũ, hoặc 'Cancel' để hủy cài đặt."
+LangString SYSTEMVERSIONNOTOK ${LANG_VIETNAMESE} "Hệ điều hành của bạn không được hỗ trợ. Yêu cầu tối thiểu: Windows 8.1!"
+LangString AUTOCHKUPDATE ${LANG_VIETNAMESE} "Tự động kiểm tra cập nhật phiên bản mới?"
+
 !insertmacro MUI_LANGUAGE "TradChinese"
 LangString DISPLAYNAME ${LANG_TRADCHINESE} "NomIME輸入法"
-LangString LNKFORMANUAL ${LANG_TRADCHINESE} "【NomIME】說明書"
-LangString LNKFORSETTING ${LANG_TRADCHINESE} "【NomIME】輸入法設定"
-LangString LNKFORDICT ${LANG_TRADCHINESE} "【NomIME】用戶詞典管理"
-LangString LNKFORSYNC ${LANG_TRADCHINESE} "【NomIME】用戶資料同步"
-LangString LNKFORDEPLOY ${LANG_TRADCHINESE} "【NomIME】重新部署"
+LangString LNKFORMANUAL ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 說明書"
+LangString LNKFORSETTING ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 輸入法設定"
+LangString LNKFORDICT ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 用戶詞典管理"
+LangString LNKFORSYNC ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 用戶資料同步"
+LangString LNKFORDEPLOY ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 重新部署"
 LangString LNKFORSERVER ${LANG_TRADCHINESE} "NomIME算法服務"
-LangString LNKFORUSERFOLDER ${LANG_TRADCHINESE} "【NomIME】用戶文件夾"
-LangString LNKFORAPPFOLDER ${LANG_TRADCHINESE} "【NomIME】程序文件夾"
-LangString LNKFORUPDATER ${LANG_TRADCHINESE} "【NomIME】檢查新版本"
-LangString LNKFORSETUP ${LANG_TRADCHINESE} "【NomIME】安裝選項"
+LangString LNKFORUSERFOLDER ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 用戶文件夾"
+LangString LNKFORAPPFOLDER ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 程序文件夾"
+LangString LNKFORUPDATER ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 檢查新版本"
+LangString LNKFORSETUP ${LANG_TRADCHINESE} "(Phương Viên - NomIME) 安裝選項"
 LangString LNKFORUNINSTALL ${LANG_TRADCHINESE} "卸載NomIME"
 LangString CONFIRMATION ${LANG_TRADCHINESE} "安裝前，請先卸載舊版本的NomIME。$\n$\n按下「確定」移除舊版本，按下「取消」放棄本次安裝。"
 LangString SYSTEMVERSIONNOTOK ${LANG_TRADCHINESE} "您的系统不被支持，最低系統要求:Windows 8.1!"
@@ -78,16 +97,16 @@ LangString AUTOCHKUPDATE ${LANG_TRADCHINESE} "自動檢查版本更新？"
 
 !insertmacro MUI_LANGUAGE "SimpChinese"
 LangString DISPLAYNAME ${LANG_SIMPCHINESE} "NomIME输入法"
-LangString LNKFORMANUAL ${LANG_SIMPCHINESE} "【NomIME】说明书"
-LangString LNKFORSETTING ${LANG_SIMPCHINESE} "【NomIME】输入法设定"
-LangString LNKFORDICT ${LANG_SIMPCHINESE} "【NomIME】用户词典管理"
-LangString LNKFORSYNC ${LANG_SIMPCHINESE} "【NomIME】用户资料同步"
-LangString LNKFORDEPLOY ${LANG_SIMPCHINESE} "【NomIME】重新部署"
+LangString LNKFORMANUAL ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 说明书"
+LangString LNKFORSETTING ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 输入法设定"
+LangString LNKFORDICT ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 用户词典管理"
+LangString LNKFORSYNC ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 用户资料同步"
+LangString LNKFORDEPLOY ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 重新部署"
 LangString LNKFORSERVER ${LANG_SIMPCHINESE} "NomIME算法服务"
-LangString LNKFORUSERFOLDER ${LANG_SIMPCHINESE} "【NomIME】用户文件夹"
-LangString LNKFORAPPFOLDER ${LANG_SIMPCHINESE} "【NomIME】程序文件夹"
-LangString LNKFORUPDATER ${LANG_SIMPCHINESE} "【NomIME】检查新版本"
-LangString LNKFORSETUP ${LANG_SIMPCHINESE} "【NomIME】安装选项"
+LangString LNKFORUSERFOLDER ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 用户文件夹"
+LangString LNKFORAPPFOLDER ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 程序文件夹"
+LangString LNKFORUPDATER ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 检查新版本"
+LangString LNKFORSETUP ${LANG_SIMPCHINESE} "(Phương Viên - NomIME) 安装选项"
 LangString LNKFORUNINSTALL ${LANG_SIMPCHINESE} "卸载NomIME"
 LangString CONFIRMATION ${LANG_SIMPCHINESE} '安装前，请先卸载旧版本的NomIME。$\n$\n点击 "确定" 移除旧版本，或点击 "取消" 放弃本次安装。'
 LangString SYSTEMVERSIONNOTOK ${LANG_SIMPCHINESE} "您的系統不被支持，最低系统要求:Windows 8.1!"
@@ -113,6 +132,7 @@ LangString AUTOCHKUPDATE ${LANG_ENGLISH} "Automatically check for updates?"
 ;--------------------------------
 
 Function .onInit
+  !insertmacro MUI_LANGDLL_DISPLAY
   ; if not version >= 8.1, quit and MessageBox(if not silent)
   ${IfNot} ${AtLeastWin8.1}
     IfSilent toquit
@@ -121,24 +141,24 @@ toquit:
     Quit
   ${EndIf}
 
-  ReadRegStr $R0 HKLM "Software\Rime\NomIME" "InstallDir"
+  ReadRegStr $R0 HKLM "Software\NomIME\NomIME" "InstallDir"
   StrCmp $R0 "" 0 skip
   ; The default installation directory
   ; install x64 build for NativeARM64_WINDOWS11 and NativeAMD64_WINDOWS11
   ${If} ${AtLeastWin11} ; Windows 11 and above
     ${If} ${IsNativeARM64}
-      StrCpy $INSTDIR "$PROGRAMFILES64\Rime"
+      StrCpy $INSTDIR "$PROGRAMFILES64\NomIME"
     ${ElseIf} ${IsNativeAMD64}
-      StrCpy $INSTDIR "$PROGRAMFILES64\Rime"
+      StrCpy $INSTDIR "$PROGRAMFILES64\NomIME"
     ${Else}
-      StrCpy $INSTDIR "$PROGRAMFILES\Rime"
+      StrCpy $INSTDIR "$PROGRAMFILES\NomIME"
     ${Endif}
   ; install x64 build for NativeAMD64_BELLOW_WINDOWS11
   ${Else} ; Windows 10 or bellow
     ${If} ${IsNativeAMD64}
-      StrCpy $INSTDIR "$PROGRAMFILES64\Rime"
+      StrCpy $INSTDIR "$PROGRAMFILES64\NomIME"
     ${Else}
-      StrCpy $INSTDIR "$PROGRAMFILES\Rime"
+      StrCpy $INSTDIR "$PROGRAMFILES\NomIME"
     ${Endif}
   ${Endif}
 skip:
@@ -154,7 +174,7 @@ skip:
 
 uninst:
   ; Backup data directory from previous installation, user files may exist
-  ReadRegStr $R1 HKLM SOFTWARE\Rime\NomIME "NomIMERoot"
+  ReadRegStr $R1 HKLM SOFTWARE\NomIME\NomIME "NomIMERoot"
   StrCmp $R1 "" call_uninstaller
   IfFileExists $R1\data\*.* 0 call_uninstaller
   CreateDirectory $TEMP\nomime-backup
@@ -164,7 +184,7 @@ call_uninstaller:
   ExecWait '"$R1\NomIMEServer.exe" /quit'
   ExecWait '"$R1\NomIMESetup.exe" /u'
   ; Remove registry keys
-  DeleteRegKey HKLM SOFTWARE\Rime
+  DeleteRegKey HKLM SOFTWARE\NomIME
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NomIME"
   ; don't redirect on 64 bit system for auto run setting
   ${If} ${IsNativeARM64}
@@ -196,7 +216,7 @@ FunctionEnd
 
 ; Registry key to check for directory (so if you install again, it will
 ; overwrite the old one automatically)
-InstallDirRegKey HKLM "Software\Rime\NomIME" "InstallDir"
+InstallDirRegKey HKLM "Software\NomIME\NomIME" "InstallDir"
 
 ; The stuff to install
 Section "NomIME"
@@ -205,8 +225,8 @@ Section "NomIME"
 
   ; Write the new installation path into the registry
   ; redirect on 64 bit system
-  ; HKLM SOFTWARE\WOW6432Node\Rime\NomIME "InstallDir" "$INSTDIR"
-  WriteRegStr HKLM SOFTWARE\Rime\NomIME "InstallDir" "$INSTDIR"
+  ; HKLM SOFTWARE\WOW6432Node\NomIME\NomIME "InstallDir" "$INSTDIR"
+  WriteRegStr HKLM SOFTWARE\NomIME\NomIME "InstallDir" "$INSTDIR"
 
   ; Reset INSTDIR for the new version
   StrCpy $INSTDIR "${NOMIME_ROOT}"
@@ -260,7 +280,7 @@ program_files:
     ${Else}
       File "Win32\NomIMEDeployer.exe"
       File "Win32\NomIMEServer.exe"
-      File "Win32\rime.dll"
+      File "Win32\NomIME.dll"
       File "Win32\WinSparkle.dll"
     ${Endif}
   ; install x64 build for NativeAMD64_BELLOW_WINDOWS11
@@ -273,7 +293,7 @@ program_files:
     ${Else}
       File "Win32\NomIMEDeployer.exe"
       File "Win32\NomIMEServer.exe"
-      File "Win32\rime.dll"
+      File "Win32\NomIME.dll"
       File "Win32\WinSparkle.dll"
     ${Endif}
   ${Endif}
@@ -314,7 +334,7 @@ program_files:
   WriteRegStr HKLM "${REG_UNINST_KEY}" "UninstallString" '"$INSTDIR\uninstall.exe"'
   WriteRegStr HKLM "${REG_UNINST_KEY}" "Publisher" "Phương Viên"
   WriteRegStr HKLM "${REG_UNINST_KEY}" "URLInfoAbout" "https://bogo.hannom.org/"
-  WriteRegStr HKLM "${REG_UNINST_KEY}" "HelpLink" "https://bogo.hannom.org/docs"
+  WriteRegStr HKLM "${REG_UNINST_KEY}" "HelpLink" "https://bogo.hannom.org/docs/"
   WriteRegDWORD HKLM "${REG_UNINST_KEY}" "NoModify" 1
   WriteRegDWORD HKLM "${REG_UNINST_KEY}" "NoRepair" 1
   WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -343,10 +363,10 @@ program_files:
   IfSilent DisableAutoCheckUpdate
   MessageBox MB_YESNO|MB_ICONINFORMATION "$(AUTOCHKUPDATE)" IDYES EnableAutoCheckUpdate
   DisableAutoCheckUpdate:
-  WriteRegStr HKCU "Software\Rime\NomIME\Updates" "CheckForUpdates" "0"
+  WriteRegStr HKCU "Software\NomIME\NomIME\Updates" "CheckForUpdates" "0"
   GoTo end
   EnableAutoCheckUpdate:
-  WriteRegStr HKCU "Software\Rime\NomIME\Updates" "CheckForUpdates" "1"
+  WriteRegStr HKCU "Software\NomIME\NomIME\Updates" "CheckForUpdates" "1"
   end:
 
   ; Prompt reboot
@@ -384,7 +404,7 @@ Section "Uninstall"
   ExecWait '"$INSTDIR\NomIMESetup.exe" /u'
 
   ; Remove registry keys
-  DeleteRegKey HKLM SOFTWARE\Rime
+  DeleteRegKey HKLM SOFTWARE\NomIME
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NomIME"
   ; don't redirect on 64 bit system for auto run setting
   ${If} ${IsNativeARM64}

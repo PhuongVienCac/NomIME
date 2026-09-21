@@ -1,9 +1,8 @@
 ﻿#include "stdafx.h"
 #include "NomIMEDeployer.h"
 #include "Configurator.h"
-#include "SwitcherSettingsDialog.h"
 #include "UIStyleSettings.h"
-#include "UIStyleSettingsDialog.h"
+#include "SettingsDialog.h"
 #include "DictManagementDialog.h"
 #include <NomIMEConstants.h>
 #include <NomIMEIPC.h>
@@ -32,6 +31,7 @@ Configurator::Configurator() {
 }
 
 void Configurator::Initialize() {
+  MigrateSuggestionSettings();
   RIME_STRUCT(RimeTraits, nomime_traits);
   std::string shared_dir = wtou8(NomIMESharedDataPath().wstring());
   std::string user_dir = wtou8(NomIMEUserDataPath().wstring());
@@ -42,7 +42,7 @@ void Configurator::Initialize() {
   nomime_traits.distribution_name = distribution_name.c_str();
   nomime_traits.distribution_code_name = NOMIME_CODE_NAME;
   nomime_traits.distribution_version = NOMIME_VERSION;
-  nomime_traits.app_name = "rime.nomime";
+  nomime_traits.app_name = "phuongvien.nomime";
   std::string log_dir = NomIMELogPath().u8string();
   nomime_traits.log_dir = log_dir.c_str();
   RimeApi* rime_api = rime_get_api();
@@ -52,30 +52,19 @@ void Configurator::Initialize() {
   rime_api->deployer_initialize(NULL);
 }
 
-static bool configure_switcher(RimeLeversApi* api,
-                               RimeSwitcherSettings* switchcer_settings,
+static bool configure_settings(RimeLeversApi* api,
+                               RimeSwitcherSettings* switcher_settings,
+                               UIStyleSettings* ui_style_settings,
                                bool* reconfigured) {
-  RimeCustomSettings* settings = (RimeCustomSettings*)switchcer_settings;
-  if (!api->load_settings(settings))
+  RimeCustomSettings* switcher = (RimeCustomSettings*)switcher_settings;
+  RimeCustomSettings* style = ui_style_settings->settings();
+  if (!api->load_settings(switcher) || !api->load_settings(style))
     return false;
-  SwitcherSettingsDialog dialog(switchcer_settings);
+  SettingsDialog dialog(switcher_settings, ui_style_settings);
   if (dialog.DoModal() == IDOK) {
-    if (api->save_settings(settings))
-      *reconfigured = true;
-    return true;
-  }
-  return false;
-}
-
-static bool configure_ui(RimeLeversApi* api,
-                         UIStyleSettings* ui_style_settings,
-                         bool* reconfigured) {
-  RimeCustomSettings* settings = ui_style_settings->settings();
-  if (!api->load_settings(settings))
-    return false;
-  UIStyleSettingsDialog dialog(ui_style_settings);
-  if (dialog.DoModal() == IDOK) {
-    if (api->save_settings(settings))
+    bool switcher_saved = api->save_settings(switcher);
+    bool style_saved = api->save_settings(style);
+    if (switcher_saved || style_saved || dialog.suggestion_changed())
       *reconfigured = true;
     return true;
   }
@@ -95,15 +84,14 @@ int Configurator::Run(bool installing) {
   RimeSwitcherSettings* switcher_settings = api->switcher_settings_init();
   UIStyleSettings ui_style_settings;
 
-  bool skip_switcher_settings =
-      installing && !api->is_first_run((RimeCustomSettings*)switcher_settings);
-  bool skip_ui_style_settings =
-      installing && !api->is_first_run(ui_style_settings.settings());
+  bool skip_settings =
+      installing &&
+      !api->is_first_run((RimeCustomSettings*)switcher_settings) &&
+      !api->is_first_run(ui_style_settings.settings());
 
-  (skip_switcher_settings ||
-   configure_switcher(api, switcher_settings, &reconfigured)) &&
-      (skip_ui_style_settings ||
-       configure_ui(api, &ui_style_settings, &reconfigured));
+  skip_settings ||
+      configure_settings(api, switcher_settings, &ui_style_settings,
+                         &reconfigured);
 
   api->custom_settings_destroy((RimeCustomSettings*)switcher_settings);
 
@@ -125,7 +113,7 @@ int Configurator::UpdateWorkspace(bool report_errors) {
     if (report_errors) {
       // MessageBox(NULL,
       // L"正在執行另一項部署任務，方纔所做的修改將在輸入法再次啓動後生效。",
-      // L"【NomIME】", MB_OK | MB_ICONINFORMATION);
+      // L"(Phương Viên - NomIME) ", MB_OK | MB_ICONINFORMATION);
       MSG_BY_IDS(IDS_STR_DEPLOYING_RESTARTREQ, IDS_STR_NOMIME,
                  MB_OK | MB_ICONINFORMATION);
     }
@@ -164,7 +152,7 @@ int Configurator::DictManagement() {
   if (GetLastError() == ERROR_ALREADY_EXISTS) {
     LOG(WARNING) << "another deployer process is running; aborting operation.";
     CloseHandle(hMutex);
-    // MessageBox(NULL, L"正在執行另一項部署任務，請稍候再試。", L"【NomIME】",
+    // MessageBox(NULL, L"正在執行另一項部署任務，請稍候再試。", L"(Phương Viên - NomIME) ",
     // MB_OK | MB_ICONINFORMATION);
     MSG_BY_IDS(IDS_STR_DEPLOYING_WAIT, IDS_STR_NOMIME,
                MB_OK | MB_ICONINFORMATION);
@@ -204,7 +192,7 @@ int Configurator::SyncUserData() {
   if (GetLastError() == ERROR_ALREADY_EXISTS) {
     LOG(WARNING) << "another deployer process is running; aborting operation.";
     CloseHandle(hMutex);
-    // MessageBox(NULL, L"正在執行另一項部署任務，請稍候再試。", L"【NomIME】",
+    // MessageBox(NULL, L"正在執行另一項部署任務，請稍候再試。", L"(Phương Viên - NomIME) ",
     // MB_OK | MB_ICONINFORMATION);
     MSG_BY_IDS(IDS_STR_DEPLOYING_WAIT, IDS_STR_NOMIME,
                MB_OK | MB_ICONINFORMATION);

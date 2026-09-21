@@ -135,10 +135,10 @@ LRESULT DictManagementDialog::OnBackup(WORD, WORD code, HWND, BOOL&) {
 
 LRESULT DictManagementDialog::OnRestore(WORD, WORD code, HWND, BOOL&) {
   CString open_str, dict_snapshot_str, kcss_dict_snapshot_str, all_files_str;
-  open_str.LoadStringW(IDS_STR_OPEN);
-  dict_snapshot_str.LoadStringW(IDS_STR_DICT_SNAPSHOT);
-  kcss_dict_snapshot_str.LoadStringW(IDS_STR_KCSS_DICT_SNAPSHOT);
-  all_files_str.LoadStringW(IDS_STR_ALL_FILES);
+  open_str = LoadStr(IDS_STR_OPEN);
+  dict_snapshot_str = LoadStr(IDS_STR_DICT_SNAPSHOT);
+  kcss_dict_snapshot_str = LoadStr(IDS_STR_KCSS_DICT_SNAPSHOT);
+  all_files_str = LoadStr(IDS_STR_ALL_FILES);
 
   const std::wstring dict_snapshot_name =
       dict_snapshot_str + L" (*.userdb.txt)";
@@ -170,11 +170,11 @@ LRESULT DictManagementDialog::OnRestore(WORD, WORD code, HWND, BOOL&) {
 LRESULT DictManagementDialog::OnExport(WORD, WORD code, HWND, BOOL&) {
   CString save_as_str, exported_str, record_count_str, all_files_str,
       txt_files_str;
-  save_as_str.LoadStringW(IDS_STR_SAVE_AS);
-  exported_str.LoadStringW(IDS_STR_EXPORTED);
-  record_count_str.LoadStringW(IDS_STR_RECORD_COUNT);
-  txt_files_str.LoadStringW(IDS_STR_TXT_FILES);
-  all_files_str.LoadStringW(IDS_STR_ALL_FILES);
+  save_as_str = LoadStr(IDS_STR_SAVE_AS);
+  exported_str = LoadStr(IDS_STR_EXPORTED);
+  record_count_str = LoadStr(IDS_STR_RECORD_COUNT);
+  txt_files_str = LoadStr(IDS_STR_TXT_FILES);
+  all_files_str = LoadStr(IDS_STR_ALL_FILES);
   const std::wstring txt_files_name = txt_files_str + L" (*.txt)";
   const std::wstring all_files_name = all_files_str;
 
@@ -221,11 +221,11 @@ LRESULT DictManagementDialog::OnExport(WORD, WORD code, HWND, BOOL&) {
 LRESULT DictManagementDialog::OnImport(WORD, WORD code, HWND, BOOL&) {
   CString open_str, imported_str, record_count_str, all_files_str,
       txt_files_str;
-  open_str.LoadStringW(IDS_STR_OPEN);
-  imported_str.LoadStringW(IDS_STR_IMPORTED);
-  record_count_str.LoadStringW(IDS_STR_RECORD_COUNT);
-  txt_files_str.LoadStringW(IDS_STR_TXT_FILES);
-  all_files_str.LoadStringW(IDS_STR_ALL_FILES);
+  open_str = LoadStr(IDS_STR_OPEN);
+  imported_str = LoadStr(IDS_STR_IMPORTED);
+  record_count_str = LoadStr(IDS_STR_RECORD_COUNT);
+  txt_files_str = LoadStr(IDS_STR_TXT_FILES);
+  all_files_str = LoadStr(IDS_STR_ALL_FILES);
   const std::wstring txt_files_name = txt_files_str + L" (*.txt)";
   const std::wstring all_files_name = all_files_str;
 
@@ -269,5 +269,14 @@ LRESULT DictManagementDialog::OnUserDictListSelChange(WORD, WORD, HWND, BOOL&) {
   backup_.EnableWindow(enabled);
   export_.EnableWindow(enabled);
   import_.EnableWindow(enabled);
+  return 0;
+}
+
+LRESULT DictManagementDialog::OnStnClickedStatic1(WORD /*wNotifyCode*/,
+                                                  WORD /*wID*/,
+                                                  HWND /*hWndCtl*/,
+                                                  BOOL& /*bHandled*/) {
+  // TODO: Add your control notification handler code here
+
   return 0;
 }

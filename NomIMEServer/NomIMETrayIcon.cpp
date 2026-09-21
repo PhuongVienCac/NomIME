@@ -80,9 +80,9 @@ void NomIMETrayIcon::Refresh() {
       SetIcon(mode_icon[mode]);
 
     if (mode_label[mode] && m_disabled == false) {
-      CString info;
-      info.LoadStringW(IDS_STR_UNDER_MAINTENANCE);
-      ShowBalloon(info, get_nomime_ime_name().c_str());
+      std::wstring info = LoadStringLang(
+          GetModuleHandle(NULL), IDS_STR_UNDER_MAINTENANCE, get_language_id());
+      ShowBalloon(info.c_str(), get_nomime_ime_name().c_str());
       m_disabled = true;
     }
     if (m_mode != DISABLED)

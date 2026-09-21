@@ -29,6 +29,7 @@
 
 #include "stdafx.h"
 #include "SystemTraySDK.h"
+#include <NomIMEUtility.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -681,7 +682,7 @@ BOOL CSystemTray::SetMenuDefaultItem(UINT uItem, BOOL bByPos) {
   m_DefaultMenuItemID = uItem;
   m_DefaultMenuItemByPos = bByPos;
 
-  HMENU hMenu = ::LoadMenu(m_hInstance, MAKEINTRESOURCE(m_tnd.uID));
+  HMENU hMenu = LoadMenuLang(m_hInstance, m_tnd.uID, get_language_id());
   if (!hMenu)
     return FALSE;
 
@@ -774,7 +775,7 @@ LRESULT CSystemTray::OnTrayNotification(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(lParam) == WM_RBUTTONUP)
 #endif
   {
-    HMENU hMenu = ::LoadMenu(m_hInstance, MAKEINTRESOURCE(m_tnd.uID));
+    HMENU hMenu = LoadMenuLang(m_hInstance, m_tnd.uID, get_language_id());
     if (!hMenu)
       return 0;
 
@@ -820,7 +821,7 @@ LRESULT CSystemTray::OnTrayNotification(WPARAM wParam, LPARAM lParam) {
 
     UINT uItem;
     if (m_DefaultMenuItemByPos) {
-      HMENU hMenu = ::LoadMenu(m_hInstance, MAKEINTRESOURCE(m_tnd.uID));
+      HMENU hMenu = LoadMenuLang(m_hInstance, m_tnd.uID, get_language_id());
       if (!hMenu)
         return 0;
 

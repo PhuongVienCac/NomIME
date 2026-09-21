@@ -87,6 +87,7 @@ class InstallOptionsDialog : public CDialogImpl<InstallOptionsDialog> {
   COMMAND_ID_HANDLER(IDC_RADIO_DEFAULT_DIR, OnUseDefaultDir)
   COMMAND_ID_HANDLER(IDC_RADIO_CUSTOM_DIR, OnUseCustomDir)
   COMMAND_ID_HANDLER(IDC_BUTTON_CUSTOM_DIR, OnUseCustomDir)
+  COMMAND_HANDLER(IDC_RADIO_CN, BN_CLICKED, OnBnClickedRadioCn)
   END_MSG_MAP()
 
   LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&);
@@ -104,4 +105,10 @@ class InstallOptionsDialog : public CDialogImpl<InstallOptionsDialog> {
   CButton ok_;
   CButton button_custom_dir_;
   CEdit dir_;
+
+ public:
+  LRESULT OnBnClickedRadioCn(WORD /*wNotifyCode*/,
+                             WORD /*wID*/,
+                             HWND /*hWndCtl*/,
+                             BOOL& /*bHandled*/);
 };
