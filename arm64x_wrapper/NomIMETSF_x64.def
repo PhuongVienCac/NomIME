@@ -1,0 +1,5 @@
+EXPORTS
+	DllGetClassObject = nomimex64.dll.DllGetClassObject
+	DllCanUnloadNow = nomimex64.dll.DllCanUnloadNow
+	DllRegisterServer = nomimex64.dll.DllRegisterServer
+	DllUnregisterServer = nomimex64.dll.DllUnregisterServer

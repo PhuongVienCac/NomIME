@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+<channel>
+    <title>(Phương Viên - NomIME) Kênh thử nghiệm</title>
+    <link>http://bogo.hannom.org/testing/nomime/appcast.xml</link>
+    <description>Kênh cập nhật Appcast bản thử nghiệm của NomIME</description>
+    <language>vi</language>
+    <item>
+      <title>NomIME 1.0.7</title>
+      <sparkle:releaseNotesLink>http://bogo.hannom.org/release/nomime/</sparkle:releaseNotesLink>
+      <pubDate>Wed, 23 Sep 2026 09:50:00 +0700</pubDate>
+      <!-- length and sparkle:edSignature must match the exact installer bytes
+           at this url. Regenerate both with update/sign-update.sh whenever a
+           new installer is published; do not hand-edit them. -->
+      <enclosure url="https://github.com/PhuongVienCac/NomIME/releases/download/1.0.7/NomIME-1.0.7.0-installer.exe"
+                 sparkle:version="1.0.7"
+                 length="19760508"
+                 sparkle:edSignature="/ybssmhJ9Qksy0We082qchoRyVT7x9k1z3DSdUUzNmQ/MH2IGl2zZnL+3seSLXjm1V4dcwUBQl0YwRaka3LFDQ=="
+                 type="application/octet-stream"/>
+    </item>
+    <item>
+      <title>NomIME 1.0.6</title>
+      <sparkle:releaseNotesLink>http://bogo.hannom.org/release/nomime/</sparkle:releaseNotesLink>
+      <pubDate>Mon, 21 Sep 2026 16:10:00 +0700</pubDate>
+      <!-- length and sparkle:edSignature must match the exact installer bytes
+           at this url. Regenerate both with update/sign-update.sh whenever a
+           new installer is published; do not hand-edit them. -->
+      <enclosure url="https://github.com/PhuongVienCac/NomIME/releases/download/1.0.6/NomIME-1.0.6.0-installer.exe"
+                 sparkle:version="1.0.6"
+                 length="10442500"
+                 sparkle:edSignature="Wxm9LSCEZnfaOSn0GT5nPfdw707DgObJYpD5kGwyHwj6m9n+RK+hXrhMeMV+DKKKECbQ/oaod4UEQd6fdCFlDA=="
+                 type="application/octet-stream"/>
+    </item>
+    <item>
+      <title>NomIME 1.0.5</title>
+      <sparkle:releaseNotesLink>http://bogo.hannom.org/release/nomime/</sparkle:releaseNotesLink>
+      <pubDate>Tue, 14 Jul 2026 09:35:04 +0700</pubDate>
+      <!-- length and sparkle:edSignature must match the exact installer bytes
+           at this url. Regenerate both with update/sign-update.sh whenever a
+           new installer is published; do not hand-edit them. -->
+      <enclosure url="https://github.com/PhuongVienCac/NomIME/releases/download/1.0.5/nomime-1.0.5.0-installer.exe"
+                 sparkle:version="1.0.5"
+                 length="11273864"
+                 sparkle:edSignature="Hq8RDzuZaZm0UYPXhsEjgtrMVjd8CQ5NIfYQptCb+YtjC1Ts/cm99YZC1ezg1V/EDDZAsL8FwmWDxz5ZES8rAA=="
+                 type="application/octet-stream"/>
+    </item>
+  </channel>
+</rss>

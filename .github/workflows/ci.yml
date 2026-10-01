@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+
+# CI only lints. The installer is built on the build machine: sealing the data
+# vault needs data_src/ and a librime patched with librime-data-vault.patch,
+# neither of which is available to a hosted runner.
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout last commit
+        uses: actions/checkout@v4
+
+      - name: Install clang-format 18
+        run: |
+          wget https://apt.llvm.org/llvm-snapshot.gpg.key
+          sudo gpg --dearmor < llvm-snapshot.gpg.key > /usr/share/keyrings/llvm-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/llvm-archive-keyring.gpg] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | sudo tee /etc/apt/sources.list.d/llvm-toolchain-jammy-18.list
+          sudo apt-get update
+          sudo apt-get install -y clang-format-18
+          sudo ln -sf /usr/bin/clang-format-18 /usr/local/bin/clang-format
+          clang-format --version
+
+      - name: Code style lint
+        shell: bash
+        run: ./clang-format.sh -i
